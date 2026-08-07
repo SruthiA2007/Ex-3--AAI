@@ -1,7 +1,7 @@
-<H3>ENTER YOUR NAME</H3>
-<H3>ENTER YOUR REGISTER NO.</H3>
+<H3>ENTER YOUR NAME : SRUTHI A</H3>
+<H3>ENTER YOUR REGISTER NO: 212224240162</H3>
 <H3>EX. NO.3</H3>
-<H3>DATE:</H3>
+<H3>DATE: 07/08/2026</H3>
 <H1 ALIGN =CENTER> Implementation of Approximate Inference in Bayesian Networks
 </H1>
 
@@ -35,12 +35,79 @@
 
 
 ## Program:
-Insert your code here
+```python
+from pgmpy.models import DiscreteBayesianNetwork
+from pgmpy.factors.discrete import TabularCPD
+from pgmpy.sampling import GibbsSampling
+import networkx as nx
+import matplotlib.pyplot as plt
+
+model = DiscreteBayesianNetwork([
+    ("Burglary", "Alarm"),
+    ("Earthquake", "Alarm"),
+    ("Alarm", "JohnCalls"),
+    ("Alarm", "MaryCalls")
+])
+
+cpd_b = TabularCPD("Burglary", 2, [[0.999], [0.001]])
+cpd_e = TabularCPD("Earthquake", 2, [[0.998], [0.002]])
+
+cpd_a = TabularCPD(
+    "Alarm", 2,
+    [[0.999, 0.71, 0.06, 0.05],
+     [0.001, 0.29, 0.94, 0.95]],
+    evidence=["Burglary", "Earthquake"],
+    evidence_card=[2, 2]
+)
+
+cpd_j = TabularCPD(
+    "JohnCalls", 2,
+    [[0.95, 0.1],
+     [0.05, 0.9]],
+    evidence=["Alarm"],
+    evidence_card=[2]
+)
+
+cpd_m = TabularCPD(
+    "MaryCalls", 2,
+    [[0.1, 0.7],
+     [0.9, 0.3]],
+    evidence=["Alarm"],
+    evidence_card=[2]
+)
+
+model.add_cpds(cpd_b, cpd_e, cpd_a, cpd_j, cpd_m)
+
+print(model.check_model())
+
+G = nx.DiGraph(model.edges())
+pos = {
+    "Burglary": (0, 0),
+    "Earthquake": (2, 0),
+    "Alarm": (1, -2),
+    "JohnCalls": (0, -4),
+    "MaryCalls": (2, -4),
+}
+
+nx.draw(G, pos, with_labels=True, node_size=1500, node_color="skyblue", arrows=True)
+plt.title("Bayesian Network: Burglar Alarm Problem")
+plt.axis("off")
+plt.show()
+
+samples = GibbsSampling(model).sample(size=10000)
+
+print("\nApproximate probabilities of Burglary:")
+print(samples["Burglary"].value_counts(normalize=True))
+
+```
 
 
 
 ## Output:
-<Show your results>
+
+<img width="732" height="506" alt="image" src="https://github.com/user-attachments/assets/9bf8007e-85ab-413d-8c05-b69f0d9ac74b" />
+
+<img width="947" height="128" alt="image" src="https://github.com/user-attachments/assets/65682f70-c2b9-44e3-b742-27b5f29b11f9" />
 
 ## Result:
 Thus, Gibb's Sampling( Approximate Inference method) is succuessfully implemented using python.
